@@ -1,13 +1,14 @@
 docker run \
-  --name jenkins-docker \
-  --rm \
+  --name jenkins-blueocean \
+  --restart=on-failure \
   --detach \
-  --volume bigBoy:/etc \
-  --privileged \
   --network jenkins \
-  --network-alias docker \
-  --env DOCKER_TLS_CERTDIR=/certs \
-  --volume jenkins-docker-certs:/certs/client \
+  --env DOCKER_HOST=tcp://docker:2376 \
+  --env DOCKER_TLS_VERIFY=1 \
+  --env JAVA_OPTS="-Dhudson.plugins.git.GitSCM.ALLOW_LOCAL_CHECKOUT=true" \
+  --volume /mnt:/mnt:ro \
   --volume jenkins-data:/var/jenkins_home \
-  --publish 2376:2376 \
-  docker:dind --storage-driver overlay2
+  --volume jenkins-docker-certs:/certs/client:ro \
+  --publish 8080:8080 \
+  --publish 50000:50000 \
+  myjenkins-blueocean:2.568.3-1
